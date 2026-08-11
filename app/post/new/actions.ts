@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isAllowedImageType } from "@/lib/upload-validation";
 import type { PostCategory } from "@/lib/types";
 
 export type CreatePostState = {
@@ -36,8 +37,8 @@ export async function createPostAction(
   if (!image || image.size === 0) {
     return { error: "An image is required" };
   }
-  if (!image.type.startsWith("image/")) {
-    return { error: "File must be an image" };
+  if (!isAllowedImageType(image.type)) {
+    return { error: "File must be a JPEG, PNG, WebP, or GIF image" };
   }
   if (image.size > MAX_IMAGE_SIZE) {
     return { error: "Image must be under 5MB" };
