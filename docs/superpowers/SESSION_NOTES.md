@@ -2,9 +2,13 @@
 
 Started while the user stepped away. This file tracks decisions made autonomously (taking the recommended option at each choice point) and any open questions worth their attention when they're back. Not part of the app — safe to delete once reviewed.
 
+## Status: stopped as requested after Phase 4
+
+Phase 4 (Post Creation & Feed) is complete, reviewed, merged to `master`, and pushed to GitHub. Stopped here per the user's instruction ("keep going, but please stop once you've finished phase 4"). Not proceeding to Phase 5 brainstorming without the user back.
+
 ## Open questions for the user
 
-(none yet)
+None blocking — see the backlog notes below for two security hardening items worth a look, but nothing that needed a decision mid-flight.
 
 ## Decisions made autonomously (informational, not blocking)
 
