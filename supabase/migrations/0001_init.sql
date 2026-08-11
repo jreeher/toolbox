@@ -125,6 +125,7 @@ create or replace function public.handle_nail_count()
 returns trigger
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   if (tg_op = 'INSERT') then
@@ -146,6 +147,7 @@ create or replace function public.handle_upvote_count()
 returns trigger
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   if (tg_op = 'INSERT') then
