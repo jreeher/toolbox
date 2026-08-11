@@ -4,7 +4,7 @@ A woodworking community platform — "Pinterest for woodworkers." Built with Nex
 
 ## Status
 
-Phase 1 (Foundation) complete: design system, routing shell, Supabase wiring, and database schema are in place. Features (auth, feed, posts, boards, search) land in later phases — see `docs/superpowers/specs/`.
+All 8 phases complete: design system, auth/profiles, the homepage animation, post creation and feed, post detail with comments, nailing and boards, follow/search, and polish (loading states, error boundaries, mobile nav, security hardening). See `docs/superpowers/specs/` for the phase-by-phase design specs.
 
 ## Setup
 
@@ -28,7 +28,9 @@ Phase 1 (Foundation) complete: design system, routing shell, Supabase wiring, an
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — your project's anon/public key (labeled "Publishable key" in newer Supabase dashboards)
    - `SUPABASE_SERVICE_ROLE_KEY` — your project's service role key (labeled "Secret key" in newer Supabase dashboards; server-side only, keep secret)
 
-5. Apply the database migration: open the Supabase Dashboard → SQL Editor, paste the contents of `supabase/migrations/0001_init.sql`, and run it. This creates all tables, enables RLS, adds the nail/upvote count triggers, the full-text search index, and the `post-images` storage bucket.
+5. Apply the database migrations, in order, via the Supabase Dashboard → SQL Editor:
+   - `supabase/migrations/0001_init.sql` — creates all tables, enables RLS, adds the nail/upvote count triggers, the full-text search index, and the `post-images` storage bucket.
+   - `supabase/migrations/0002_security_hardening.sql` — tightens the `post-images` upload policy to be scoped to each user's own storage path.
 
 6. Run the dev server:
 

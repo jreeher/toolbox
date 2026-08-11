@@ -53,8 +53,12 @@ export function PostCard({
 
   async function handleShare() {
     const url = `${window.location.origin}/post/${post.id}`;
-    await navigator.clipboard.writeText(url);
-    toast("Link copied to clipboard");
+    try {
+      await navigator.clipboard.writeText(url);
+      toast("Link copied to clipboard");
+    } catch {
+      toast("Couldn't copy link — clipboard access was denied");
+    }
   }
 
   return (

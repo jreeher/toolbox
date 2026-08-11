@@ -5,6 +5,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { PostCard } from "@/components/PostCard";
 import { createPostAction, type CreatePostState } from "./actions";
 import { CATEGORIES } from "@/lib/categories";
+import { isAllowedImageType, ALLOWED_IMAGE_TYPES } from "@/lib/upload-validation";
 
 const initialState: CreatePostState = {};
 
@@ -51,8 +52,8 @@ export function PostForm({ author }: PostFormProps) {
       setPreviewUrl(null);
       return;
     }
-    if (!file.type.startsWith("image/")) {
-      setFileError("Please choose an image file");
+    if (!isAllowedImageType(file.type)) {
+      setFileError("Please choose a JPEG, PNG, WebP, or GIF image");
       e.target.value = "";
       setPreviewUrl(null);
       return;
@@ -109,7 +110,7 @@ export function PostForm({ author }: PostFormProps) {
         <input
           type="file"
           name="image"
-          accept="image/*"
+          accept={ALLOWED_IMAGE_TYPES.join(",")}
           required
           onChange={handleFileChange}
           className="text-off-white text-sm"
