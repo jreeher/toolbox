@@ -15,6 +15,8 @@ const VALID_CATEGORIES: PostCategory[] = [
   "plans-blueprints",
 ];
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
 export async function createPostAction(
   _prevState: CreatePostState,
   formData: FormData
@@ -34,6 +36,12 @@ export async function createPostAction(
   if (!image || image.size === 0) {
     return { error: "An image is required" };
   }
+  if (!image.type.startsWith("image/")) {
+    return { error: "File must be an image" };
+  }
+  if (image.size > MAX_IMAGE_SIZE) {
+    return { error: "Image must be under 5MB" };
+  }
 
   const supabase = await createClient();
   const {
@@ -44,7 +52,8 @@ export async function createPostAction(
     redirect("/login?reason=auth");
   }
 
-  const filePath = `${user.id}/${Date.now()}-${image.name}`;
+  const fileExt = image.name.includes(".") ? image.name.split(".").pop() : "jpg";
+  const filePath = `${user.id}/${crypto.randomUUID()}.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from("post-images")
