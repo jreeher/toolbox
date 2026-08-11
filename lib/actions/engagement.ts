@@ -71,3 +71,43 @@ export async function toggleNailAction(
   revalidatePath(path);
   return {};
 }
+
+export async function toggleFollowAction(
+  targetUserId: string,
+  path: string
+): Promise<EngagementState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "You must be signed in to follow" };
+  }
+
+  if (user.id === targetUserId) {
+    return { error: "You can't follow yourself" };
+  }
+
+  const { data: existing } = await supabase
+    .from("follows")
+    .select("follower_id")
+    .eq("follower_id", user.id)
+    .eq("following_id", targetUserId)
+    .maybeSingle();
+
+  const { error } = existing
+    ? await supabase
+        .from("follows")
+        .delete()
+        .eq("follower_id", user.id)
+        .eq("following_id", targetUserId)
+    : await supabase.from("follows").insert({ follower_id: user.id, following_id: targetUserId });
+
+  if (error) {
+    return { error: "Failed to update follow. Please try again." };
+  }
+
+  revalidatePath(path);
+  return {};
+}

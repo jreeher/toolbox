@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar } from "@/components/Avatar";
 import { signOutAction } from "@/lib/auth/actions";
@@ -25,10 +26,20 @@ export async function ToolboxNav() {
       <span className="font-heading text-2xl tracking-wide text-toolbox-red">
         THE TOOLBOX
       </span>
-      <nav className="hidden md:flex gap-8 font-body text-sm text-off-white">
-        <span>Feed</span>
-        <span>Categories</span>
-        <span>Boards</span>
+      <nav className="hidden md:flex items-center gap-8 font-body text-sm text-off-white">
+        <Link href="/feed">Feed</Link>
+        {user && profile && <Link href={`/u/${profile.username}/boards`}>Boards</Link>}
+        <form action="/search" className="flex items-center gap-1">
+          <input
+            type="text"
+            name="q"
+            placeholder="Search..."
+            className="bg-wood-dark border border-chrome text-off-white text-sm px-2 py-1 rounded w-40"
+          />
+          <button type="submit" aria-label="Search" className="text-off-white">
+            <Search size={16} />
+          </button>
+        </form>
       </nav>
       <div className="flex items-center gap-3">
         {user && profile ? (
