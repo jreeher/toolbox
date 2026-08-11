@@ -2,9 +2,14 @@
 
 Started while the user stepped away. This file tracks decisions made autonomously (taking the recommended option at each choice point) and any open questions worth their attention when they're back. Not part of the app — safe to delete once reviewed.
 
-## Status: stopped as requested after Phase 4
+## Status: Phase 5 complete, merged to master
 
-Phase 4 (Post Creation & Feed) is complete, reviewed, merged to `master`, and pushed to GitHub. Stopped here per the user's instruction ("keep going, but please stop once you've finished phase 4"). Not proceeding to Phase 5 brainstorming without the user back.
+Phase 5 (Post Detail & Comments) is complete, manually verified end-to-end against a real Supabase project (signup → onboarding → post creation → commenting → replying → logged-out view → 404), merged to `master`, and pushed to GitHub. This session picked up on a second computer, working from the design specs/plans/session notes already in the repo rather than any memory of the original session.
+
+Two bugs found and fixed during this phase (both pre-existing or newly introduced, not tooling artifacts):
+
+1. **Pre-existing Phase 4 bug**: the feed's `posts` ↔ `profiles` query (`app/feed/page.tsx`, `app/feed/feed-list.tsx`) was ambiguous to PostgREST because of the `upvotes` bridge table (which also FKs to both `posts` and `profiles`), throwing `PGRST201` and silently returning zero posts. Fixed with an explicit FK hint: `profiles!posts_user_id_fkey(...)`. This means the feed was likely broken on this Supabase project the whole time Phase 4 was "working" elsewhere — worth checking whether the other computer's project has the same `upvotes` FK shape, or whether this only surfaces on fresh migrations.
+2. **New Phase 5 bug**: `CommentComposer`'s "did a submission just complete" detection used an `isFirstRender` ref flag, which isn't safe under React 18 Strict Mode's dev-mode double-effect-invocation — the reply composer would flash open and immediately snap shut. Fixed with the standard pattern of comparing against the previous state value via a ref, not a boolean flag.
 
 ## Open questions for the user
 
