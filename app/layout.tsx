@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Inter } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { ToolboxNav } from "@/components/ToolboxNav";
 
@@ -36,6 +37,16 @@ export default function RootLayout({
         />
         <ToolboxNav />
         <main className="relative pt-16">{children}</main>
+        <Toaster
+          theme="dark"
+          toastOptions={{
+            style: {
+              background: "var(--charcoal)",
+              color: "var(--off-white)",
+              border: "1px solid var(--chrome)",
+            },
+          }}
+        />
       </body>
     </html>
   );
