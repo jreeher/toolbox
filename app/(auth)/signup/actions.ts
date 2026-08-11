@@ -16,6 +16,10 @@ export async function signUpAction(
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
+  if (password.length < 6) {
+    return { error: "Password must be at least 6 characters" };
+  }
+
   if (password !== confirmPassword) {
     return { error: "Passwords don't match" };
   }
