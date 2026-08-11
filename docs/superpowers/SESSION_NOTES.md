@@ -12,3 +12,8 @@ Started while the user stepped away. This file tracks decisions made autonomousl
 - Will default to the "recommended" option at any future brainstorming/execution choice point instead of stopping to ask, per the user's request to keep working through the night.
 - Will still merge to `master` + push to GitHub after each phase completes review, matching the pattern approved for Phases 1-3, since the user explicitly approved this exact flow twice already this session.
 - Will still create a feature branch per phase and get it independently reviewed (spec + code quality + final holistic pass) before merging — no shortcuts on review rigor, just no pausing for approval between phases.
+
+## Backlog notes for Phase 8 (Polish)
+
+- PostCard's Share button has no error handling around `navigator.clipboard.writeText` (silent failure if clipboard access is denied). Low priority.
+- Toast notifications (sonner) aren't screen-reader-announced by default; worth an ARIA live region pass if accessibility becomes a priority.
