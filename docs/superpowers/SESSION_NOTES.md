@@ -2,7 +2,11 @@
 
 Started while the user stepped away. This file tracks decisions made autonomously (taking the recommended option at each choice point) and any open questions worth their attention when they're back. Not part of the app — safe to delete once reviewed.
 
-## Status: Phase 6 complete, merged to master
+## Status: Phase 7 complete, merged to master
+
+Phase 7 (Social & Search) is complete, manually verified end-to-end against a real Supabase project using two test accounts (profile pages, follow/unfollow with persistence, own-profile hides Follow button, 404 for nonexistent usernames, logged-out redirect gating, full-text search with results and empty state), merged to `master`, and pushed to GitHub. No new bugs found this phase — build and lint clean, no server errors during manual testing beyond the pre-existing unrelated homepage background-image 404 (unsplash URL in `app/layout.tsx`, present since Phase 1, not touched).
+
+One deliberate deviation from the letter of the Phase 2 plan, noted in the Phase 7 spec: "Categories" was dropped from `ToolboxNav` instead of being wired to a link, since no `/categories` page was ever speced anywhere — inventing one would have been scope creep. "Feed" and "Boards" (the latter only shown when logged in) are now real links.
 
 Phase 6 (Nailing & Boards) is complete, manually verified end-to-end against a real Supabase project (nail toggle with board picker, inline board creation, upvote toggle, un-nail, logged-out redirect gating, `/boards/[id]` and `/u/[username]/boards` pages), merged to `master`, and pushed to GitHub. No new bugs found this phase — build and lint clean, no server errors during manual testing.
 
