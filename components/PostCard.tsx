@@ -2,10 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Hammer, ThumbsUp, MessageCircle, Share2 } from "lucide-react";
+import { MessageCircle, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { Avatar } from "@/components/Avatar";
+import { NailButton } from "@/components/NailButton";
+import { UpvoteButton } from "@/components/UpvoteButton";
+
+interface ViewerState {
+  isLoggedIn: boolean;
+  isNailed: boolean;
+  isUpvoted: boolean;
+  viewerBoards: { id: string; name: string }[];
+}
+
+const LOGGED_OUT_VIEWER: ViewerState = {
+  isLoggedIn: false,
+  isNailed: false,
+  isUpvoted: false,
+  viewerBoards: [],
+};
 
 interface PostCardProps {
   post: {
@@ -21,9 +37,18 @@ interface PostCardProps {
     username: string;
     avatarUrl: string | null;
   };
+  path?: string;
+  viewer?: ViewerState;
+  interactive?: boolean;
 }
 
-export function PostCard({ post, author }: PostCardProps) {
+export function PostCard({
+  post,
+  author,
+  path = "/feed",
+  viewer = LOGGED_OUT_VIEWER,
+  interactive = true,
+}: PostCardProps) {
   const isBlobUrl = post.imageUrl.startsWith("blob:");
 
   async function handleShare() {
@@ -57,12 +82,23 @@ export function PostCard({ post, author }: PostCardProps) {
         </div>
         <div className="flex items-center justify-between text-off-white text-sm">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <Hammer size={14} /> {post.nailCount}
-            </span>
-            <span className="flex items-center gap-1">
-              <ThumbsUp size={14} /> {post.upvoteCount}
-            </span>
+            <NailButton
+              postId={post.id}
+              path={path}
+              initialNailed={viewer.isNailed}
+              initialCount={post.nailCount}
+              viewerBoards={viewer.viewerBoards}
+              isLoggedIn={viewer.isLoggedIn}
+              interactive={interactive}
+            />
+            <UpvoteButton
+              postId={post.id}
+              path={path}
+              initialUpvoted={viewer.isUpvoted}
+              initialCount={post.upvoteCount}
+              isLoggedIn={viewer.isLoggedIn}
+              interactive={interactive}
+            />
             <Link href={`/post/${post.id}`} className="flex items-center gap-1">
               <MessageCircle size={14} /> {post.commentCount}
             </Link>

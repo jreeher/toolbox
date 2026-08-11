@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { MasonryGrid } from "@/components/MasonryGrid";
 import { PostCard } from "@/components/PostCard";
+import type { ViewerEngagement } from "@/lib/engagement-queries";
 import type { FeedPost } from "./types";
 
 const PAGE_SIZE = 20;
@@ -12,6 +13,10 @@ interface FeedListProps {
   initialPosts: FeedPost[];
   category: string | null;
   sort: string;
+  isLoggedIn: boolean;
+  viewerId: string | null;
+  viewerBoards: { id: string; name: string }[];
+  initialEngagement: ViewerEngagement;
 }
 
 function sortToColumn(sort: string): { column: string; ascending: boolean } {
@@ -20,15 +25,26 @@ function sortToColumn(sort: string): { column: string; ascending: boolean } {
   return { column: "created_at", ascending: false };
 }
 
-export function FeedList({ initialPosts, category, sort }: FeedListProps) {
+export function FeedList({
+  initialPosts,
+  category,
+  sort,
+  isLoggedIn,
+  viewerId,
+  viewerBoards,
+  initialEngagement,
+}: FeedListProps) {
   const [posts, setPosts] = useState(initialPosts);
+  const [engagement, setEngagement] = useState(initialEngagement);
   const [hasMore, setHasMore] = useState(initialPosts.length === PAGE_SIZE);
   const [loading, setLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPosts(initialPosts);
+    setEngagement(initialEngagement);
     setHasMore(initialPosts.length === PAGE_SIZE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialPosts]);
 
   useEffect(() => {
@@ -75,6 +91,23 @@ export function FeedList({ initialPosts, category, sort }: FeedListProps) {
     }
 
     const newPosts = (data as FeedPost[]) ?? [];
+
+    if (viewerId && newPosts.length > 0) {
+      const newIds = newPosts.map((p) => p.id);
+      const [{ data: nails }, { data: upvotes }] = await Promise.all([
+        supabase.from("nails").select("post_id, board_id").eq("user_id", viewerId).in("post_id", newIds),
+        supabase.from("upvotes").select("post_id").eq("user_id", viewerId).in("post_id", newIds),
+      ]);
+      setEngagement((prev) => {
+        const nailed = { ...prev.nailed };
+        for (const nail of nails ?? []) nailed[nail.post_id] = nail.board_id;
+        return {
+          nailed,
+          upvoted: [...prev.upvoted, ...(upvotes ?? []).map((u) => u.post_id)],
+        };
+      });
+    }
+
     setPosts((prev) => [...prev, ...newPosts]);
     setHasMore(newPosts.length === PAGE_SIZE);
     setLoading(false);
@@ -98,6 +131,13 @@ export function FeedList({ initialPosts, category, sort }: FeedListProps) {
             author={{
               username: post.profiles?.username ?? "unknown",
               avatarUrl: post.profiles?.avatar_url ?? null,
+            }}
+            path={`/feed${category ? `?category=${category}` : ""}`}
+            viewer={{
+              isLoggedIn,
+              isNailed: post.id in engagement.nailed,
+              isUpvoted: engagement.upvoted.includes(post.id),
+              viewerBoards,
             }}
           />
         ))}

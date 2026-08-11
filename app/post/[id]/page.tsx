@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Hammer, ThumbsUp, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { Avatar } from "@/components/Avatar";
 import { MasonryGrid } from "@/components/MasonryGrid";
 import { PostCard } from "@/components/PostCard";
+import { NailButton } from "@/components/NailButton";
+import { UpvoteButton } from "@/components/UpvoteButton";
 import { CommentThread } from "@/components/CommentThread";
+import { getViewerEngagement, getViewerBoards } from "@/lib/engagement-queries";
 import type { CommentWithAuthor } from "@/lib/types";
 import type { FeedPost } from "@/app/feed/types";
 
@@ -50,6 +53,18 @@ export default async function PostDetailPage({
       .limit(RELATED_LIMIT),
   ]);
 
+  const allPostIds = [post.id, ...((relatedPosts as FeedPost[] | null) ?? []).map((p) => p.id)];
+  const [engagement, viewerBoards] = await Promise.all([
+    getViewerEngagement(supabase, user?.id ?? null, allPostIds),
+    getViewerBoards(supabase, user?.id ?? null),
+  ]);
+  const viewer = {
+    isLoggedIn: !!user,
+    isUpvoted: engagement.upvoted.includes(post.id),
+    isNailed: post.id in engagement.nailed,
+    viewerBoards,
+  };
+
   const comments: CommentWithAuthor[] = (rawComments ?? [])
     .filter((c) => c.profiles)
     .map((c) => ({
@@ -85,12 +100,21 @@ export default async function PostDetailPage({
               <span className="text-off-white text-sm">{post.profiles.username}</span>
             </Link>
             <div className="flex items-center gap-3 text-off-white text-sm">
-              <span className="flex items-center gap-1">
-                <Hammer size={14} /> {post.nail_count}
-              </span>
-              <span className="flex items-center gap-1">
-                <ThumbsUp size={14} /> {post.upvote_count}
-              </span>
+              <NailButton
+                postId={post.id}
+                path={`/post/${post.id}`}
+                initialNailed={viewer.isNailed}
+                initialCount={post.nail_count}
+                viewerBoards={viewer.viewerBoards}
+                isLoggedIn={viewer.isLoggedIn}
+              />
+              <UpvoteButton
+                postId={post.id}
+                path={`/post/${post.id}`}
+                initialUpvoted={viewer.isUpvoted}
+                initialCount={post.upvote_count}
+                isLoggedIn={viewer.isLoggedIn}
+              />
               <span className="flex items-center gap-1">
                 <MessageCircle size={14} /> {comments.length}
               </span>
@@ -120,6 +144,13 @@ export default async function PostDetailPage({
                 author={{
                   username: related.profiles?.username ?? "unknown",
                   avatarUrl: related.profiles?.avatar_url ?? null,
+                }}
+                path={`/post/${post.id}`}
+                viewer={{
+                  isLoggedIn: viewer.isLoggedIn,
+                  isNailed: related.id in engagement.nailed,
+                  isUpvoted: engagement.upvoted.includes(related.id),
+                  viewerBoards,
                 }}
               />
             ))}
