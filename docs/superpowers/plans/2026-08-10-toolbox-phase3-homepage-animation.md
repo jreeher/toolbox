@@ -156,7 +156,7 @@ git commit -m "Add ToolboxDrawer component: category link with hover and stagger
 ```tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/lib/hooks/use-prefers-reduced-motion";
@@ -182,7 +182,13 @@ const drawersContainerVariants = {
 
 export function ToolboxHero() {
   const reducedMotion = usePrefersReducedMotion();
-  const [stage, setStage] = useState<Stage>(reducedMotion ? "open" : "closed");
+  const [stage, setStage] = useState<Stage>("closed");
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setStage("open");
+    }
+  }, [reducedMotion]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 py-16 px-4">
@@ -248,7 +254,7 @@ This is Task 3, building on Tasks 1-2 (the reduced-motion hook and `ToolboxDrawe
 
 `onAnimationComplete` on the photo's `motion.div` fires once the `rotateX`/`opacity` animation finishes, calling `setStage("open")` — this swaps the closed-photo markup out and the CSS toolbox body + drawers in. This is the state-machine-via-callback pattern the spec calls for, not a fixed `setTimeout`.
 
-When `reducedMotion` is true, `stage` initializes directly to `"open"` (skipping the photo/animation entirely), and every `motion.div` in the open-state tree uses `initial={false}` so Framer Motion renders them in their final visual state immediately with no transition. `ToolboxDrawer` (Task 2) already implements this same `reducedMotion` branching for its own `variants`/`initial`/`animate` props — this component just threads the same boolean down to all four.
+**Hydration safety:** `stage` always initializes to `"closed"`, matching what the server renders (Task 1's `usePrefersReducedMotion()` returns `false` during SSR by design, since `window` doesn't exist there). If it initialized to `reducedMotion ? "open" : "closed"` directly, a client whose real preference is `true` would compute a different value on its first render than the server did, causing a React hydration mismatch — this exact risk was flagged during Task 1's code review. Instead, a `useEffect` (which only runs after hydration completes) checks `reducedMotion` and flips `stage` to `"open"` post-mount if needed. This means reduced-motion users see one harmless render frame of the closed-photo state before it's immediately replaced — imperceptible in practice, and safe. Once `stage` is `"open"`, every `motion.div` in that tree uses `initial={false}` so Framer Motion renders them in their final visual state immediately with no transition. `ToolboxDrawer` (Task 2) already implements this same `reducedMotion` branching for its own `variants`/`initial`/`animate` props — this component just threads the same boolean down to all four. Because `ToolboxDrawer` only ever renders once `stage === "open"`, and `stage` starts `"closed"` on both server and client, `ToolboxDrawer` itself is never part of the initial SSR/hydration render — it only mounts client-side afterward, so it carries no hydration-mismatch risk of its own.
 
 `next/image` with `fill` requires a positioned parent with defined dimensions — the parent `motion.div` here has `className="absolute inset-0 rounded overflow-hidden"` inside the outer `relative w-full max-w-md h-64` container, satisfying that requirement. `priority` is set since this is the largest above-the-fold image on the homepage.
 
