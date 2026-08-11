@@ -17,3 +17,10 @@ Started while the user stepped away. This file tracks decisions made autonomousl
 
 - PostCard's Share button has no error handling around `navigator.clipboard.writeText` (silent failure if clipboard access is denied). Low priority.
 - Toast notifications (sonner) aren't screen-reader-announced by default; worth an ARIA live region pass if accessibility becomes a priority.
+
+## Backlog notes for a security hardening follow-up (from Phase 4 final review)
+
+1. **Storage RLS policy isn't path-scoped.** The `post_images_authenticated_upload` policy (Phase 1 migration) only checks `bucket_id = 'post-images' and auth.role() = 'authenticated'` — any authenticated user can currently overwrite any other user's uploaded file, since the `${user_id}/...` path prefix is an app-level convention, not DB-enforced. Fix: a new migration tightening the policy to `with check (bucket_id = 'post-images' and auth.uid()::text = (storage.foldername(name))[1])`. Cheap now; gets more annoying to retrofit once boards/avatars reuse this bucket.
+2. **Image MIME validation is a loose `image/*` prefix check**, both client- and server-side in the create-post flow. This would accept `image/svg+xml`, which can carry script content and is publicly served once uploaded. Fix: switch to an explicit allow-list (`image/jpeg`, `image/png`, `image/webp`, `image/gif`) in both `app/post/new/actions.ts` (server) and `app/post/new/post-form.tsx` (client).
+
+Neither blocked the Phase 4 merge — the final holistic review rated the branch "Approved (merge-ready)" and recommended these as fast-follow items, not blockers.
