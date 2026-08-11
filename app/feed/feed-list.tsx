@@ -58,7 +58,7 @@ export function FeedList({ initialPosts, category, sort }: FeedListProps) {
 
     let query = supabase
       .from("posts")
-      .select("*, profiles(username, avatar_url)")
+      .select("*, profiles!posts_user_id_fkey(username, avatar_url)")
       .range(posts.length, posts.length + PAGE_SIZE - 1)
       .order(column, { ascending });
 
