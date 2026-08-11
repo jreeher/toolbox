@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { PostCard } from "@/components/PostCard";
 import { createPostAction, type CreatePostState } from "./actions";
@@ -35,9 +35,18 @@ export function PostForm({ author }: PostFormProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     setFileError(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     if (!file) {
       setPreviewUrl(null);
       return;

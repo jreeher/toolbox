@@ -9,7 +9,7 @@ export default async function NewPostPage() {
     .from("profiles")
     .select("username, avatar_url")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   return (
     <div className="max-w-4xl mx-auto">
