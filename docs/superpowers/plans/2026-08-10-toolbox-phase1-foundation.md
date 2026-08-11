@@ -463,7 +463,7 @@ create table profiles (
   username text unique not null,
   avatar_url text,
   bio text,
-  created_at timestamptz default now()
+  created_at timestamptz not null default now()
 );
 
 create table boards (
@@ -471,8 +471,8 @@ create table boards (
   user_id uuid references profiles(id) on delete cascade,
   name text not null,
   description text,
-  is_public bool default true,
-  created_at timestamptz default now()
+  is_public bool not null default true,
+  created_at timestamptz not null default now()
 );
 
 create table posts (
@@ -483,9 +483,9 @@ create table posts (
   category text not null check (category in ('projects', 'tips-techniques', 'tool-talk', 'plans-blueprints')),
   subcategory text,
   image_url text not null,
-  upvote_count int default 0,
-  nail_count int default 0,
-  created_at timestamptz default now(),
+  upvote_count int not null default 0,
+  nail_count int not null default 0,
+  created_at timestamptz not null default now(),
   search_vector tsvector generated always as (
     to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, ''))
   ) stored
@@ -500,7 +500,7 @@ create table nails (
   user_id uuid references profiles(id) on delete cascade,
   post_id uuid references posts(id) on delete cascade,
   board_id uuid references boards(id) on delete set null,
-  created_at timestamptz default now(),
+  created_at timestamptz not null default now(),
   unique (user_id, post_id)
 );
 
@@ -516,7 +516,7 @@ create table comments (
   user_id uuid references profiles(id) on delete cascade,
   parent_id uuid references comments(id) on delete cascade,
   content text not null,
-  created_at timestamptz default now()
+  created_at timestamptz not null default now()
 );
 
 create table upvotes (
