@@ -2,7 +2,9 @@
 
 Started while the user stepped away. This file tracks decisions made autonomously (taking the recommended option at each choice point) and any open questions worth their attention when they're back. Not part of the app — safe to delete once reviewed.
 
-## Status: Phase 5 complete, merged to master
+## Status: Phase 6 complete, merged to master
+
+Phase 6 (Nailing & Boards) is complete, manually verified end-to-end against a real Supabase project (nail toggle with board picker, inline board creation, upvote toggle, un-nail, logged-out redirect gating, `/boards/[id]` and `/u/[username]/boards` pages), merged to `master`, and pushed to GitHub. No new bugs found this phase — build and lint clean, no server errors during manual testing.
 
 Phase 5 (Post Detail & Comments) is complete, manually verified end-to-end against a real Supabase project (signup → onboarding → post creation → commenting → replying → logged-out view → 404), merged to `master`, and pushed to GitHub. This session picked up on a second computer, working from the design specs/plans/session notes already in the repo rather than any memory of the original session.
 
