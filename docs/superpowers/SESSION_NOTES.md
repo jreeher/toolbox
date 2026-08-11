@@ -2,6 +2,14 @@
 
 Started while the user stepped away. This file tracks decisions made autonomously (taking the recommended option at each choice point) and any open questions worth their attention when they're back. Not part of the app — safe to delete once reviewed.
 
+## Status: All 8 phases complete, merged to master
+
+Phase 8 (Polish) — the final phase of the original plan — is complete: loading skeletons on every data-fetching route, a root error boundary, a mobile nav drawer (the center nav links had no mobile fallback until now), Share button clipboard error handling, and the two security hardening items flagged after Phase 4's review (path-scoped storage upload policy, image MIME allow-list closing the `image/svg+xml` gap). Merged to `master`, pushed to GitHub.
+
+**Action needed from the user**: `supabase/migrations/0002_security_hardening.sql` has NOT been applied to the live database — it needs to be run manually via the Supabase Dashboard → SQL Editor, same as `0001_init.sql` originally was. This wasn't done from this session since there's no direct Postgres/dashboard access here.
+
+With this, "The Toolbox" has every feature from the original 8-phase plan built, tested, and merged: auth, feed, posting, comments, nailing, boards, follow, search, and polish. Nothing is scoped or planned beyond this — any further work is a new decision for the user to make, not a continuation of an existing plan.
+
 ## Status: Phase 7 complete, merged to master
 
 Phase 7 (Social & Search) is complete, manually verified end-to-end against a real Supabase project using two test accounts (profile pages, follow/unfollow with persistence, own-profile hides Follow button, 404 for nonexistent usernames, logged-out redirect gating, full-text search with results and empty state), merged to `master`, and pushed to GitHub. No new bugs found this phase — build and lint clean, no server errors during manual testing beyond the pre-existing unrelated homepage background-image 404 (unsplash URL in `app/layout.tsx`, present since Phase 1, not touched).
