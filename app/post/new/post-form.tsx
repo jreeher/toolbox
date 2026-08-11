@@ -133,6 +133,7 @@ export function PostForm({ author }: PostFormProps) {
               commentCount: 0,
             }}
             author={author}
+            interactive={false}
           />
         ) : (
           <div className="border-2 border-chrome rounded aspect-[4/3] flex items-center justify-center text-dark-chrome text-sm">

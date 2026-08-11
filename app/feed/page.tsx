@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES } from "@/lib/categories";
+import { getViewerEngagement, getViewerBoards } from "@/lib/engagement-queries";
 import { FeedList } from "./feed-list";
 import type { FeedPost } from "./types";
 
@@ -44,6 +45,20 @@ export default async function FeedPage({
     console.error("Failed to fetch feed posts:", error);
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const feedPosts = (posts as FeedPost[]) ?? [];
+  const [engagement, viewerBoards] = await Promise.all([
+    getViewerEngagement(
+      supabase,
+      user?.id ?? null,
+      feedPosts.map((p) => p.id)
+    ),
+    getViewerBoards(supabase, user?.id ?? null),
+  ]);
+
   return (
     <div className="p-8">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -84,9 +99,13 @@ export default async function FeedPage({
       </div>
 
       <FeedList
-        initialPosts={(posts as FeedPost[]) ?? []}
+        initialPosts={feedPosts}
         category={category ?? null}
         sort={sort}
+        isLoggedIn={!!user}
+        viewerId={user?.id ?? null}
+        viewerBoards={viewerBoards}
+        initialEngagement={engagement}
       />
     </div>
   );
