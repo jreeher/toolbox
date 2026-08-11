@@ -60,3 +60,16 @@ export interface Upvote {
   user_id: string;
   post_id: string;
 }
+
+export interface CommentWithAuthor {
+  id: string;
+  post_id: string;
+  user_id: string;
+  parent_id: string | null;
+  content: string;
+  created_at: string;
+  author: {
+    username: string;
+    avatar_url: string | null;
+  };
+}

@@ -28,7 +28,7 @@ export default async function FeedPage({
 
   let query = supabase
     .from("posts")
-    .select("*, profiles(username, avatar_url)")
+    .select("*, profiles!posts_user_id_fkey(username, avatar_url)")
     .range(0, PAGE_SIZE - 1);
 
   if (category) {
