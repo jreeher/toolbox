@@ -30,6 +30,9 @@ function LoginForm() {
     if (searchParams.get("reason") === "auth") {
       toast("Sign in to continue");
     }
+    if (searchParams.get("error") === "confirmation_failed") {
+      toast.error("That confirmation link is invalid or expired — try signing up again");
+    }
   }, [searchParams]);
 
   return (
