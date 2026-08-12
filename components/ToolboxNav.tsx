@@ -26,9 +26,9 @@ export async function ToolboxNav() {
     <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-charcoal border-b-2 border-chrome flex items-center justify-between px-6 gap-4">
       <div className="flex items-center gap-4">
         <MobileNavDrawer profile={profile} />
-        <span className="font-heading text-2xl tracking-wide text-toolbox-red">
+        <Link href="/" className="font-heading text-2xl tracking-wide text-toolbox-red">
           THE TOOLBOX
-        </span>
+        </Link>
       </div>
       <nav className="hidden md:flex items-center gap-8 font-body text-sm text-off-white">
         <Link href="/feed">Feed</Link>
