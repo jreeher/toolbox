@@ -31,8 +31,7 @@ export default function RootLayout({
         <div
           className="fixed inset-0 -z-10 bg-charcoal bg-cover bg-center bg-fixed opacity-30"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1504148455328-c376907d081c)",
+            backgroundImage: "url(/images/background-workshop.png)",
           }}
         />
         <ToolboxNav />
