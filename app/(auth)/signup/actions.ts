@@ -35,5 +35,18 @@ export async function signUpAction(
     redirect("/onboarding");
   }
 
+  // Email confirmation is off, but signUp() didn't return a session directly
+  // (this can happen depending on project config) — sign in explicitly so
+  // the user lands in the app immediately instead of seeing a stale
+  // "check your email" message when no confirmation is actually required.
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (!signInError) {
+    redirect("/onboarding");
+  }
+
   return { checkEmail: true };
 }
